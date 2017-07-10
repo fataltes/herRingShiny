@@ -80,29 +80,37 @@ selectBuilder <- function(input, output, session) {
 
 
 
-drawPlot <- function(input, output, session) {
+showResults <- function(input, output, session) {
   ns <- session$ns
-
-  output$distPlot <- renderPlot({
-    crRes = allres[allres$CR == input$crType,]
-    if (input$crType == 'CC') {
-      if (!is.null(input$Propc))
-        selectedRes <- crRes[crRes$Propc == input$Propc,]
-    } else if (input$crType == 'CCC') {
-      if (!is.null(input$Propc) & !is.null(input$Fcapprop))
-        selectedRes <- crRes[crRes$Propc == input$Propc & 
-                               crRes$Fcapprop == input$Fcapprop,]
-    } else {
-      if (!is.null(input$FracBmsyThreshHi) & !is.null(input$FracBmsyThreshLo) & !is.null(input$FracFtarg)) {
-        selectedRes <- crRes[crRes$FracBmsyThreshHi == input$FracBmsyThreshHi &
-                               crRes$FracBmsyThreshLo == input$FracBmsyThreshLo &
-                               crRes$FracFtarg == input$FracFtarg,]
-      }
-    }
-    if (exists("selectedRes")) {
-      xy <- selectedRes[order(selectedRes[,input$x]), c(input$x, input$y, 'bias', 'steep')]
+  xy <- reactive({
+        crRes = allres[allres$CR == input$crType,]
+        if (input$crType == 'CC') {
+          if (!is.null(input$Propc))
+            selectedRes <- crRes[crRes$Propc == input$Propc,]
+        } else if (input$crType == 'CCC') {
+          if (!is.null(input$Propc) & !is.null(input$Fcapprop))
+            selectedRes <- crRes[crRes$Propc == input$Propc & 
+                                   crRes$Fcapprop == input$Fcapprop,]
+        } else {
+          if (!is.null(input$FracBmsyThreshHi) & !is.null(input$FracBmsyThreshLo) & !is.null(input$FracFtarg)) {
+            selectedRes <- crRes[crRes$FracBmsyThreshHi == input$FracBmsyThreshHi &
+                                   crRes$FracBmsyThreshLo == input$FracBmsyThreshLo &
+                                   crRes$FracFtarg == input$FracFtarg,]
+          }
+        }
       
-      ggplot(xy, aes_string(x=input$x, y=input$y, color='bias', shape='steep')) +
+        if (exists("selectedRes")) {
+          return (selectedRes[order(selectedRes[,input$x]), c('bias', 'steep', input$x, input$y)])
+        }  
+  })
+  
+  
+  output$distPlot <- renderPlot({
+    print("111")
+    xyVal <- xy()
+    if (!is.null(xyVal)) {
+      print("hereee")
+      ggplot(xyVal, aes_string(x=input$x, y=input$y, color='bias', shape='steep')) +
         geom_point(size=3) +
         theme_classic() +
         xlab(dispName(input$x)) +
@@ -110,5 +118,9 @@ drawPlot <- function(input, output, session) {
         theme(plot.title = element_text(hjust = 0.5))
     }
     
+  })
+  
+  output$view <- renderTable({
+      xy()
   })
 }

@@ -24,6 +24,6 @@ shinyServer(function(input, output, session) {
 
   xyPanel <- callModule(setXYAxisOptions, "specificCR")
   selectedPanel <- callModule(selectBuilder, "specificCR")
-  plotPanel <- callModule(drawPlot, "specificCR")
+  plotPanel <- callModule(showResults, "specificCR")
   
 })

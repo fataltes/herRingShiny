@@ -23,9 +23,12 @@ selectBuilderUI <- function(id) {
   )
 }
 
-drawPlotOutput <- function(id) {
+showResultsOutput <- function(id) {
   ns <- NS(id)
-  plotOutput(ns("distPlot"))
+  fluidPage(
+    plotOutput(ns("distPlot")),
+    tableOutput(ns("view"))
+  )
 }
 
 
@@ -42,7 +45,7 @@ shinyUI(fluidPage(
 
       mainPanel(
         tabsetPanel(
-          tabPanel("Specific Rule", drawPlotOutput("specificCR")), 
+          tabPanel("Specific Rule", showResultsOutput("specificCR")), 
           tabPanel("A Category of Rules", verbatimTextOutput("crType"))
         )
       )
