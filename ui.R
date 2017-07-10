@@ -1,5 +1,12 @@
 library(shiny)
 
+setXYAxisOptionsUI <- function(id) {
+  ns <- NS(id)
+  tagList(
+             uiOutput(ns("selectX")),
+             uiOutput(ns("selectY"))
+    )
+}
 
 selectBuilderUI <- function(id) {
   ns <- NS(id)
@@ -12,19 +19,7 @@ selectBuilderUI <- function(id) {
     ),
     uiOutput(ns("crParams")),
     uiOutput(ns("low")),
-    #conditionalPanel(condition = "input.crType == 'BB'",
-    #                 selectInput(ns("alaki"), label = h3("choose Control Rule"), 
-    #                             choices = list("CC", "CCC", "BB", "BB3yr", "BB5yr", "BB3yrPerc"), selected = "CC")
-                     
-                     #uiOutput(ns("low"))
-    #                 )#,
     uiOutput(ns("hi"))
-    #conditionalPanel(condition = "input.crType == 'BB'",
-    #                 selectInput(ns("FracFtarg"), dispName('FracFtarg'),
-    #                             choices = uniqueFracFtarg[uniqueFracFtarg$FracBmsyThreshHi == input$FracBmsyThreshHi &
-    #                                                         uniqueFracFtarg$FracBmsyThreshLo == input$FracBmsyThreshLo  
-    #                                                       ,'FracFtarg']))
-                     
   )
 }
 
@@ -32,22 +27,22 @@ drawPlotOutput <- function(id) {
   ns <- NS(id)
   plotOutput(ns("distPlot"))
 }
-# UI for yield-MedianSSB that draws a line
+
+
 shinyUI(fluidPage(
 
-  # Application title
   titlePanel("Herring Interactive Visualization"),
 
   
   sidebarLayout(
     sidebarPanel(
-      selectBuilderUI("crOptions")
+      setXYAxisOptionsUI("specificCR"),
+      selectBuilderUI("specificCR")
       ),
 
-      # Show a plot of the generated distribution
       mainPanel(
         tabsetPanel(
-          tabPanel("Specific Rule", drawPlotOutput("crOptions")), 
+          tabPanel("Specific Rule", drawPlotOutput("specificCR")), 
           tabPanel("A Category of Rules", verbatimTextOutput("crType"))
         )
       )

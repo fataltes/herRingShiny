@@ -4,8 +4,26 @@ dispName <- function(outName) {
   return (dispNames[dispNames$OutName==outName, 'DisplayName'])
 }
 
+setXYAxisOptions <- function(input, output, session) {
+
+  output$selectX <- renderUI({
+    ns <- session$ns
+    return (
+        selectInput(ns("x"), 'Choose X Axis',
+                    choices = xyChoices)
+      )
+  })
+  
+  output$selectY <- renderUI({
+    ns <- session$ns
+    return (
+      selectInput(ns("y"), 'Choose Y Axis',
+                  choices = xyChoices)
+    )
+  })
+}
+
 selectBuilder <- function(input, output, session) {
-  #print (input$crType)
   crType <- reactive({
     # If no file is selected, don't do anything
     validate(need(input$crType, message = FALSE))
@@ -13,8 +31,6 @@ selectBuilder <- function(input, output, session) {
   })
   
   getSelects <- reactive({
-    #print ("in getSelects")
-    #print (crType())
     ns <- session$ns
     if (crType() == 'CC') {
       renderedPanel <- selectInput(ns("Propc"), dispName('Propc'),
@@ -27,8 +43,6 @@ selectBuilder <- function(input, output, session) {
                               choices = uniqueFcapprop))
       )
     } else {
-      #print ("here again")
-      #print (c(input$FracBmsyThreshLo, input$FracBmsyThreshHi, input$FracFtarg))
       renderedPanel <- 
                selectInput(ns("FracBmsyThreshLo"), dispName('FracBmsyThreshLo'),
                               choices = uniqueFracBmsyThreshLo)
@@ -68,12 +82,10 @@ selectBuilder <- function(input, output, session) {
 
 drawPlot <- function(input, output, session) {
   ns <- session$ns
-  
+
   output$distPlot <- renderPlot({
-    #body()
     crRes = allres[allres$CR == input$crType,]
     if (input$crType == 'CC') {
-      #print (input$Propc)
       if (!is.null(input$Propc))
         selectedRes <- crRes[crRes$Propc == input$Propc,]
     } else if (input$crType == 'CCC') {
@@ -82,24 +94,20 @@ drawPlot <- function(input, output, session) {
                                crRes$Fcapprop == input$Fcapprop,]
     } else {
       if (!is.null(input$FracBmsyThreshHi) & !is.null(input$FracBmsyThreshLo) & !is.null(input$FracFtarg)) {
-        #print (c(input$FracBmsyThreshLo, input$FracBmsyThreshHi, input$FracFtarg))
         selectedRes <- crRes[crRes$FracBmsyThreshHi == input$FracBmsyThreshHi &
                                crRes$FracBmsyThreshLo == input$FracBmsyThreshLo &
                                crRes$FracFtarg == input$FracFtarg,]
-        #print (nrow(selectedRes))
       }
     }
     if (exists("selectedRes")) {
-      xy <- selectedRes[order(selectedRes$MedianSSB), c('MedianSSB', 'Yield', 'bias', 'steep')]
+      xy <- selectedRes[order(selectedRes[,input$x]), c(input$x, input$y, 'bias', 'steep')]
       
-      ggplot(xy, aes(x=MedianSSB, y=Yield, color=bias, shape=steep)) +
+      ggplot(xy, aes_string(x=input$x, y=input$y, color='bias', shape='steep')) +
         geom_point(size=3) +
         theme_classic() +
-        xlab(dispName('MedianSSB')) +
-        ylab(dispName('Yield')) +
+        xlab(dispName(input$x)) +
+        ylab(dispName(input$y)) +
         theme(plot.title = element_text(hjust = 0.5))
-      #plot(xy$MedianSSB, xy$Yield, type="p", col = xy$bias, 
-      #     xlab = dispNames[dispNames$OutName=='MedianSSB', 'DisplayName'], ylab = dispNames[dispNames$OutName=='Yield', 'DisplayName'])
     }
     
   })
