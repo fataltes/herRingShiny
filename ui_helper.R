@@ -106,10 +106,8 @@ showResults <- function(input, output, session) {
   
   
   output$distPlot <- renderPlot({
-    print("111")
     xyVal <- xy()
     if (!is.null(xyVal)) {
-      print("hereee")
       ggplot(xyVal, aes_string(x=input$x, y=input$y, color='bias', shape='steep')) +
         geom_point(size=3) +
         theme_classic() +
