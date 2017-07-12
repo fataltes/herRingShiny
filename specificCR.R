@@ -1,27 +1,3 @@
-library(ggplot2)
-
-dispName <- function(outName) {
-  return (dispNames[dispNames$OutName==outName, 'DisplayName'])
-}
-
-setXYAxisOptions <- function(input, output, session) {
-
-  output$selectX <- renderUI({
-    ns <- session$ns
-    return (
-        selectInput(ns("x"), 'Choose X Axis',
-                    choices = xyChoices)
-      )
-  })
-  
-  output$selectY <- renderUI({
-    ns <- session$ns
-    return (
-      selectInput(ns("y"), 'Choose Y Axis',
-                  choices = xyChoices)
-    )
-  })
-}
 
 selectBuilder <- function(input, output, session) {
   crType <- reactive({
@@ -82,6 +58,17 @@ selectBuilder <- function(input, output, session) {
 
 showSpecificCRResult <- function(input, output, session) {
   ns <- session$ns
+  
+  x <- reactive({
+    validate(need(input$x, message = FALSE))
+    input$x
+  })
+  
+  y <- reactive({
+    validate(need(input$y, message = FALSE))
+    input$y
+  })
+  
   xy <- reactive({
         crRes = allres[allres$CR == input$crType,]
         if (input$crType == 'CC') {
@@ -111,14 +98,16 @@ showSpecificCRResult <- function(input, output, session) {
       ggplot(xyVal, aes_string(x=input$x, y=input$y, color='bias', shape='steep')) +
         geom_point(size=3) +
         theme_classic() +
-        xlab(dispName(input$x)) +
-        ylab(dispName(input$y)) +
+        xlab(dispName(x())) +
+        ylab(dispName(y())) +
         theme(plot.title = element_text(hjust = 0.5))
     }
     
   })
   
   output$view <- renderTable({
-      xy()
+      res <- xy()
+      colnames(res) <- c("Bias", "Steep", toString(dispName(x())), toString(dispName(y())))
+      return (res)
   })
 }

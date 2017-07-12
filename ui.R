@@ -8,22 +8,32 @@ setXYAxisOptionsUI <- function(id) {
     )
 }
 
+setCRUI <- function(id) {
+  ns <- NS(id)
+  tagList(
+         selectInput(ns("crType"), label = h3("choose Control Rule"), 
+                     choices = list("CC", "CCC", "BB", "BB3yr", "BB5yr", "BB3yrPerc"), selected = "CC")
+  )
+}
+
+setFacetUI <- function(id) {
+  ns <- NS(id)
+  tagList(
+    selectInput(ns("split"), label = h3("choose Split Facet"), 
+              choices = list("none", "bias", "steep", "bias_steep"), selected = "none")
+  )
+}
+
 selectBuilderUI <- function(id) {
   ns <- NS(id)
   tagList(
-    fluidRow(
-      column(12,
-             selectInput(ns("crType"), label = h3("choose Control Rule"), 
-                         choices = list("CC", "CCC", "BB", "BB3yr", "BB5yr", "BB3yrPerc"), selected = "CC")
-      )
-    ),
     uiOutput(ns("crParams")),
     uiOutput(ns("low")),
     uiOutput(ns("hi"))
   )
 }
 
-showResultsOutput <- function(id) {
+showSpecificCRResultOutput <- function(id) {
   ns <- NS(id)
   fluidPage(
     plotOutput(ns("distPlot")),
@@ -31,23 +41,42 @@ showResultsOutput <- function(id) {
   )
 }
 
+showCRCategoryResultOutput <- function(id) {
+  ns <- NS(id)
+  fluidPage(
+    plotOutput(ns("distPlot"))
+  )
+}
 
 shinyUI(fluidPage(
 
   titlePanel("Herring Interactive Visualization"),
 
   
-  sidebarLayout(
-    sidebarPanel(
-      setXYAxisOptionsUI("specificCR"),
-      selectBuilderUI("specificCR")
-      ),
-
-      mainPanel(
-        tabsetPanel(
-          tabPanel("Specific Rule", showResultsOutput("specificCR")), 
-          tabPanel("A Category of Rules", verbatimTextOutput("crType"))
-        )
-      )
+  tabsetPanel(
+    tabPanel("Specific Rule", 
+           sidebarLayout(
+               sidebarPanel(
+                   setXYAxisOptionsUI("specificCR"),
+                   setCRUI("specificCR"),
+                   selectBuilderUI("specificCR")
+               ),
+              mainPanel(
+                 showSpecificCRResultOutput("specificCR")
+              )
+           )
+    ),
+    tabPanel("A Category of Rules", 
+             sidebarLayout(
+               sidebarPanel(
+                 setXYAxisOptionsUI("crCategory"),
+                 setCRUI("crCategory"),
+                 setFacetUI("crCategory")
+             ),
+               mainPanel(
+                 showCRCategoryResultOutput("crCategory")
+               )
+             )
+    )
   )
 ))
