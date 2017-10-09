@@ -54,23 +54,10 @@ showCRCategoryResultOutput <- function(id) {
 }
 ')),
 
-  tags$script('
-              $(document).ready(function(){
-              // id of the plot
-              $("#distPlot").mousemove(function(e){ 
-              
-              // ID of uiOutput
-              $("#my_tooltip").show();         
-              $("#my_tooltip").css({             
-              top: (e.pageY + 5) + "px",             
-              left: (e.pageX + 5) + "px"         
-              });     
-              });     
-              });
-              '),
-    plotOutput(ns("distPlot"), hover = hoverOpts(id = "plot_hover")),
-    verbatimTextOutput("my_tooltip", placeholder = TRUE)
-    #uiOutput(ns("dynamic"))
+  
+    plotOutput(ns("distPlot"), hover = hoverOpts(ns("plot_hover"))),
+    verbatimTextOutput(ns("my_tooltip"))
+    #, placeholder = TRUE
   )
 }
 

@@ -22,8 +22,6 @@ showCRCategoryResult <- function(input, output, session) {
     return (selectedRes[order(selectedRes[, x()]), c('bias', 'steep', x(), y())])
   })
  
-  #addPopover(session, "distPlot", "Data", content = paste0("hi"), trigger = 'hover') 
-  
   output$distPlot <- renderPlot({
     xyVal <- xy()
     if (!is.null(xyVal)) {
@@ -44,15 +42,13 @@ showCRCategoryResult <- function(input, output, session) {
     }
   })
   
-  output$dynamic <- renderUI({
-    #req(input$plot_hover) 
-    verbatimTextOutput("hover_info")
-  })
-  
   output$my_tooltip <- renderPrint({
     #req(input$plot_hover)
-    print("got the hover signal")
-    cat("input$plot_hover:\n")
-    str(input$plot_hover)
+    #print("got the hover signal")
+    cat("X/Y values of the point:\n")
+    xyVal <- xy()
+    pnt <- nearPoints(xyVal, input$plot_hover, input$x, input$y)[1, c(input$x, input$y)]
+    req(nrow(pnt) != 0)
+    str(pnt)
   })
 }

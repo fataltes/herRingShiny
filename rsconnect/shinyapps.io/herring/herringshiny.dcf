@@ -5,8 +5,8 @@ account: herring
 server: shinyapps.io
 hostUrl: https://api.shinyapps.io/v1
 appId: 216525
-bundleId: 1015750
+bundleId: 1016814
 url: https://herring.shinyapps.io/herringshiny/
-when: 1507432855.41146
+when: 1507527288.61897
 asMultiple: FALSE
 asStatic: FALSE
