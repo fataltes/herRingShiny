@@ -44,7 +44,33 @@ showSpecificCRResultOutput <- function(id) {
 showCRCategoryResultOutput <- function(id) {
   ns <- NS(id)
   fluidPage(
-    plotOutput(ns("distPlot"))
+    #plotlyOutput(ns("distPlot"))
+    tags$head(tags$style('
+     #my_tooltip {
+                         position: absolute;
+                         width: 300px;
+                         z-index: 100;
+                         padding: 0;
+}
+')),
+
+  tags$script('
+              $(document).ready(function(){
+              // id of the plot
+              $("#distPlot").mousemove(function(e){ 
+              
+              // ID of uiOutput
+              $("#my_tooltip").show();         
+              $("#my_tooltip").css({             
+              top: (e.pageY + 5) + "px",             
+              left: (e.pageX + 5) + "px"         
+              });     
+              });     
+              });
+              '),
+    plotOutput(ns("distPlot"), hover = hoverOpts(id = "plot_hover")),
+    verbatimTextOutput("my_tooltip", placeholder = TRUE)
+    #uiOutput(ns("dynamic"))
   )
 }
 

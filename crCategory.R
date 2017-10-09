@@ -1,7 +1,7 @@
 
 showCRCategoryResult <- function(input, output, session) {
   ns <- session$ns
-
+  #print(ns)
   crType <- reactive({
     validate(need(input$crType, message = FALSE))
     input$crType
@@ -21,7 +21,8 @@ showCRCategoryResult <- function(input, output, session) {
     selectedRes = allres[allres$CR == crType(),]
     return (selectedRes[order(selectedRes[, x()]), c('bias', 'steep', x(), y())])
   })
-  
+ 
+  #addPopover(session, "distPlot", "Data", content = paste0("hi"), trigger = 'hover') 
   
   output$distPlot <- renderPlot({
     xyVal <- xy()
@@ -31,6 +32,7 @@ showCRCategoryResult <- function(input, output, session) {
         theme_classic() +
         xlab(dispName(x())) +
         ylab(dispName(y())) 
+      #sp <- ggplotly(sp)
       if (!is.null(input$split)) {
         switch(input$split,
                none = sp,
@@ -40,5 +42,17 @@ showCRCategoryResult <- function(input, output, session) {
                )
       }
     }
+  })
+  
+  output$dynamic <- renderUI({
+    #req(input$plot_hover) 
+    verbatimTextOutput("hover_info")
+  })
+  
+  output$my_tooltip <- renderPrint({
+    #req(input$plot_hover)
+    print("got the hover signal")
+    cat("input$plot_hover:\n")
+    str(input$plot_hover)
   })
 }

@@ -1,9 +1,9 @@
 library(shiny)
 library(ggplot2)
-
-rm(list=ls())
-allres<-readRDS("allres.rds")
-dispNames<-read.csv('AllResNameDecoder.csv')
+library(plotly)
+#rm(list=ls())
+#allres<-readRDS("allres.rds")
+#dispNames<-read.csv('AllResNameDecoder.csv')
 
 source('global.R', local=TRUE)
 source('specificCR.R', local=TRUE)
